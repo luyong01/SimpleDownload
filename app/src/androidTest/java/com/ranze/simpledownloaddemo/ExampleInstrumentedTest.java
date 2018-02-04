@@ -1,4 +1,4 @@
-package com.ranze.simpledownload;
+package com.ranze.simpledownloaddemo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

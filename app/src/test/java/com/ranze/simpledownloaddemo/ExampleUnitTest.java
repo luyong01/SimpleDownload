@@ -1,4 +1,4 @@
-package com.ranze.simpledownload;
+package com.ranze.simpledownloaddemo;
 
 import org.junit.Test;
 
