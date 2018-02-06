@@ -23,6 +23,8 @@ public class RealDownloader implements Downloader {
     private Task mTask;
     private DownloadListener mDownloadListener;
     private File mTargetFile;
+    private boolean mExecuted;
+
 
     public RealDownloader(SimpleDownloadClient client, Task task) {
         this.mClient = client;
@@ -32,6 +34,11 @@ public class RealDownloader implements Downloader {
 
     @Override
     public void start(final DownloadListener listener) {
+        synchronized (this) {
+            if (mExecuted) throw new IllegalStateException("Already Executed");
+            mExecuted = true;
+        }
+
         mDownloadListener = listener;
 
         new Thread() {

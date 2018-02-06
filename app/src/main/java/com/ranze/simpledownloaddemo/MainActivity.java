@@ -5,13 +5,11 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mDownloadBtn;
     private Button mPauseBtn;
     private Button mCancelBtn;
+
+    private Downloader mDownloader;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,41 +72,43 @@ public class MainActivity extends AppCompatActivity {
                 .fileName(fileName)
                 .build();
 
-        Downloader downloader = client.newDownloader(task);
 
-        mDownloadBtn.setOnClickListener((view) -> downloader.start(new DownloadListener() {
-            @Override
-            public void onStart() {
-                Toast.makeText(MainActivity.this, "开始下载", Toast.LENGTH_SHORT).show();
-            }
+        mDownloadBtn.setOnClickListener((view) -> {
+            mDownloader = client.newDownloader(task);
+            mDownloader.start(new DownloadListener() {
+                @Override
+                public void onStart() {
+                    Toast.makeText(MainActivity.this, "开始下载", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onPause() {
-                Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onPause() {
+                    Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onComplete() {
-                Toast.makeText(MainActivity.this, "已完成", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onComplete() {
+                    Toast.makeText(MainActivity.this, "已完成", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onError(Throwable t) {
-                Toast.makeText(MainActivity.this, "下载出错", Toast.LENGTH_SHORT).show();
-                Log.d("test", t.toString());
-            }
+                @Override
+                public void onError(Throwable t) {
+                    Toast.makeText(MainActivity.this, "下载出错", Toast.LENGTH_SHORT).show();
+                    Log.d("test", t.toString());
+                }
 
-            @Override
-            public void onProgress(int progress) {
-                mProgressBar.setProgress(progress);
-                mProgressText.setText(progress + " %");
-            }
-        }));
+                @Override
+                public void onProgress(int progress) {
+                    mProgressBar.setProgress(progress);
+                    mProgressText.setText(progress + " %");
+                }
+            });
+        });
 
-        mPauseBtn.setOnClickListener((view) -> downloader.pause());
+        mPauseBtn.setOnClickListener((view) -> mDownloader.pause());
 
         mCancelBtn.setOnClickListener((view) -> {
-            downloader.cancel();
+            mDownloader.cancel();
             mProgressBar.setProgress(0);
             mProgressText.setText("0 %");
         });
@@ -116,11 +118,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS_STORAGE,
