@@ -74,7 +74,7 @@ public class SimpleDownloadClient {
         }
 
         public Builder context(Context context) {
-            this.context = context;
+            this.context = context.getApplicationContext();
             return this;
         }
 
