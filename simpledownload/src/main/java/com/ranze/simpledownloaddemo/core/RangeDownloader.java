@@ -111,12 +111,7 @@ class RangeDownloader extends BaseDownloader {
     }
 
     private void doPause() {
-        if (mPausedThreadCount.addAndGet(1) == mThreadCount) {
-            if (mDownloadListener != null) {
-                client.handler().post(() -> mDownloadListener.onPause());
-            }
 
-        }
     }
 
     private void checkForRemoveTask() {

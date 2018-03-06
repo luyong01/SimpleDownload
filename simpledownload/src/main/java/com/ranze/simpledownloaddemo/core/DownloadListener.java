@@ -7,8 +7,6 @@ package com.ranze.simpledownloaddemo.core;
 public interface DownloadListener {
     void onStart();
 
-    void onPause();
-
     void onComplete();
 
     void onError(Throwable t);

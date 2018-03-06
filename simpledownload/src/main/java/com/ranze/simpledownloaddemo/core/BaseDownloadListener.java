@@ -11,11 +11,6 @@ public abstract class BaseDownloadListener implements DownloadListener {
     }
 
     @Override
-    public void onPause() {
-
-    }
-
-    @Override
     public void onComplete() {
 
     }

@@ -82,11 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onPause() {
-                    Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
                 public void onComplete() {
                     Toast.makeText(MainActivity.this, "已完成", Toast.LENGTH_SHORT).show();
                 }
