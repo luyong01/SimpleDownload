@@ -46,6 +46,10 @@ class NormalDownloader extends BaseDownloader {
                 byte[] buf = new byte[1024 * 100];
                 int len = -1;
                 while ((len = mInputStream.read(buf)) != -1) {
+                    if (mStatus == DownloadStatus.canceled) {
+                        LogUtil.d("Task " + mTask + "canceled");
+                        break;
+                    }
                     out.write(buf, 0, len);
                     doProgress(len);
                 }
