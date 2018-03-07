@@ -1,6 +1,6 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
-import com.ranze.simpledownloaddemo.util.MD5Util;
+import com.ranze.simpledownload.util.MD5Util;
 
 /**
  * Created by ranze on 2018/1/16.

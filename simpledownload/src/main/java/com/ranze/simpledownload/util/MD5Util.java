@@ -1,4 +1,4 @@
-package com.ranze.simpledownloaddemo.util;
+package com.ranze.simpledownload.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

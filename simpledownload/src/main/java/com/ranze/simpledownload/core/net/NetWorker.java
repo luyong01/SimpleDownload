@@ -1,4 +1,4 @@
-package com.ranze.simpledownloaddemo.core.net;
+package com.ranze.simpledownload.core.net;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;

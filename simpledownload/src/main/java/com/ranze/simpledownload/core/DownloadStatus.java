@@ -1,4 +1,4 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
 enum DownloadStatus {
     preparing,

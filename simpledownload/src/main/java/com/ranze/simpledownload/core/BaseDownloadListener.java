@@ -1,14 +1,10 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
 /**
  * Created by ranze on 2018/2/2.
  */
 
 public abstract class BaseDownloadListener implements DownloadListener {
-    @Override
-    public void onStart() {
-
-    }
 
     @Override
     public void onComplete() {

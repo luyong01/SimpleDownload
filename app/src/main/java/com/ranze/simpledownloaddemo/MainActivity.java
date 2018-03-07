@@ -14,9 +14,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ranze.simpledownloaddemo.core.DownloadListener;
-import com.ranze.simpledownloaddemo.core.Downloader;
-import com.ranze.simpledownloaddemo.core.Task;
+import com.ranze.simpledownload.SimpleDownloadClient;
+import com.ranze.simpledownload.core.Call;
+import com.ranze.simpledownload.core.DownloadListener;
+import com.ranze.simpledownload.core.Task;
 
 import java.io.File;
 
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mPauseBtn;
     private Button mCancelBtn;
 
-    private Downloader mDownloader;
+    private Call mDownloadCall;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,13 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         mDownloadBtn.setOnClickListener((view) -> {
-            mDownloader = client.newDownloader(task);
-            mDownloader.start(new DownloadListener() {
-                @Override
-                public void onStart() {
-                    Toast.makeText(MainActivity.this, "开始下载", Toast.LENGTH_SHORT).show();
-                }
-
+            mDownloadCall = client.newCall(task);
+            mDownloadCall.enqueue(new DownloadListener() {
                 @Override
                 public void onComplete() {
                     Toast.makeText(MainActivity.this, "已完成", Toast.LENGTH_SHORT).show();
@@ -100,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        mPauseBtn.setOnClickListener((view) -> mDownloader.pause());
+        mPauseBtn.setOnClickListener((view) -> mDownloadCall.pause());
 
         mCancelBtn.setOnClickListener((view) -> {
-            mDownloader.cancel();
+            mDownloadCall.cancel();
             mProgressBar.setProgress(0);
             mProgressText.setText("0 %");
         });

@@ -1,11 +1,11 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
 import android.support.annotation.WorkerThread;
 
-import com.ranze.simpledownloaddemo.SimpleDownloadClient;
-import com.ranze.simpledownloaddemo.repository.Repository;
-import com.ranze.simpledownloaddemo.util.IOUtil;
-import com.ranze.simpledownloaddemo.util.LogUtil;
+import com.ranze.simpledownload.SimpleDownloadClient;
+import com.ranze.simpledownload.repository.Repository;
+import com.ranze.simpledownload.util.IOUtil;
+import com.ranze.simpledownload.util.LogUtil;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.ResponseBody;
@@ -30,9 +31,8 @@ class RangeDownloader extends BaseDownloader {
     private List<Segment> mSegments;
     private Repository mRepository;
 
-
-    RangeDownloader(SimpleDownloadClient client, Task task, long contentLength, int threadCount) {
-        super(client, task);
+    RangeDownloader(SimpleDownloadClient client, Task task, long contentLength, int threadCount, CountDownLatch countDownLatch) {
+        super(client, task, countDownLatch);
 
         if (threadCount < 1) {
             threadCount = 1;
@@ -47,8 +47,8 @@ class RangeDownloader extends BaseDownloader {
     }
 
     @WorkerThread
-    public void start(DownloadListener listener) {
-        super.start(listener);
+    public void download(DownloadListener listener) {
+        super.download(listener);
 
         if (mStatus != DownloadStatus.downloading) {
             return;
@@ -114,12 +114,6 @@ class RangeDownloader extends BaseDownloader {
 
     }
 
-    private void checkForRemoveTask() {
-        if (mEndedThreadCount.addAndGet(1) == mThreadCount) {
-            removeTask();
-        }
-    }
-
     class DownloadWorker implements Runnable {
         private Segment segment;
         private long readSize = 0;
@@ -175,7 +169,6 @@ class RangeDownloader extends BaseDownloader {
                         break;
                     }
 
-
                     raf.write(buffer, 0, len);
                     readSize += len;
                     doProgress(len);
@@ -190,7 +183,7 @@ class RangeDownloader extends BaseDownloader {
             } finally {
                 IOUtil.close(raf);
                 IOUtil.close(in);
-                checkForRemoveTask();
+                mCountDownLatch.countDown();
             }
         }
     }

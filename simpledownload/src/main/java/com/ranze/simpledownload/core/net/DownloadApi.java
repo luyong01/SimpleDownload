@@ -1,4 +1,4 @@
-package com.ranze.simpledownloaddemo.core.net;
+package com.ranze.simpledownload.core.net;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

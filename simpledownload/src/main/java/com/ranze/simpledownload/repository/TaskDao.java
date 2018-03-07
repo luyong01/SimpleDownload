@@ -1,11 +1,11 @@
-package com.ranze.simpledownloaddemo.repository;
+package com.ranze.simpledownload.repository;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import com.ranze.simpledownloaddemo.core.Segment;
+import com.ranze.simpledownload.core.Segment;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package com.ranze.simpledownloaddemo.repository;
+package com.ranze.simpledownload.repository;
 
 import android.arch.persistence.room.RoomDatabase;
 
-import com.ranze.simpledownloaddemo.core.Segment;
+import com.ranze.simpledownload.core.Segment;
 
 /**
  * Created by ranze on 2018/1/19.

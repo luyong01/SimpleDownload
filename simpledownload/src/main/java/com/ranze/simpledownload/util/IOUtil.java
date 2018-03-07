@@ -1,4 +1,4 @@
-package com.ranze.simpledownloaddemo.util;
+package com.ranze.simpledownload.util;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;

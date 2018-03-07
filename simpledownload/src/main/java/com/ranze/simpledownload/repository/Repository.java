@@ -1,9 +1,9 @@
-package com.ranze.simpledownloaddemo.repository;
+package com.ranze.simpledownload.repository;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
-import com.ranze.simpledownloaddemo.core.Segment;
+import com.ranze.simpledownload.core.Segment;
 
 import java.util.List;
 

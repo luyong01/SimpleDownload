@@ -1,13 +1,13 @@
-package com.ranze.simpledownloaddemo;
+package com.ranze.simpledownload;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.ranze.simpledownloaddemo.core.Downloader;
-import com.ranze.simpledownloaddemo.core.RealDownloader;
-import com.ranze.simpledownloaddemo.core.Task;
-import com.ranze.simpledownloaddemo.util.LogUtil;
+import com.ranze.simpledownload.core.Dispatcher;
+import com.ranze.simpledownload.core.RealCall;
+import com.ranze.simpledownload.core.Task;
+import com.ranze.simpledownload.util.LogUtil;
 
 import okhttp3.OkHttpClient;
 
@@ -16,6 +16,7 @@ import okhttp3.OkHttpClient;
  */
 
 public class SimpleDownloadClient {
+    private Dispatcher mDispatcher;
     private int mThreadCount;
     private Handler mHandler;
     private Context mContext;
@@ -23,6 +24,7 @@ public class SimpleDownloadClient {
     private boolean mDebuggable;
 
     private SimpleDownloadClient(Builder builder) {
+        this.mDispatcher = builder.mDispatcher;
         this.mThreadCount = builder.threadCount;
         this.mHandler = new Handler(Looper.getMainLooper());
         this.mContext = builder.context;
@@ -45,19 +47,28 @@ public class SimpleDownloadClient {
         return mHandler;
     }
 
+    public Dispatcher dispatcher() {
+        return mDispatcher;
+    }
+
     public OkHttpClient okHttpClient() {
         return mOkHttpClient;
     }
 
-    public Downloader newDownloader(final Task task) {
-        return new RealDownloader(this, task);
+    public RealCall newCall(final Task task) {
+        return new RealCall(this, task);
     }
 
     public static class Builder {
+        private Dispatcher mDispatcher;
         private int threadCount = 3;
         private Context context;
         private OkHttpClient okhttpClient;
         private boolean debug;
+
+        public Builder() {
+            this.mDispatcher = new Dispatcher();
+        }
 
         public SimpleDownloadClient build() {
             return new SimpleDownloadClient(this);

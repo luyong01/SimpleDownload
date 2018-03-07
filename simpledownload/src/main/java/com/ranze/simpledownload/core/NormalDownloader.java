@@ -1,14 +1,15 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
-import com.ranze.simpledownloaddemo.SimpleDownloadClient;
-import com.ranze.simpledownloaddemo.util.IOUtil;
-import com.ranze.simpledownloaddemo.util.LogUtil;
+import com.ranze.simpledownload.util.IOUtil;
+import com.ranze.simpledownload.SimpleDownloadClient;
+import com.ranze.simpledownload.util.LogUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.CountDownLatch;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -20,14 +21,14 @@ import retrofit2.Response;
 class NormalDownloader extends BaseDownloader {
     private InputStream mInputStream;
 
-    NormalDownloader(SimpleDownloadClient client, Task task, long contentLength) {
-        super(client, task);
+    NormalDownloader(SimpleDownloadClient client, Task task, long contentLength, CountDownLatch countDownLatch) {
+        super(client, task, countDownLatch);
         mContentLength = contentLength;
     }
 
     @Override
-    public void start(DownloadListener listener) {
-        super.start(listener);
+    public void download(DownloadListener listener) {
+        super.download(listener);
         if (mStatus != DownloadStatus.downloading) {
             return;
         }
@@ -57,7 +58,7 @@ class NormalDownloader extends BaseDownloader {
             } finally {
                 IOUtil.close(mInputStream);
                 IOUtil.close(out);
-                removeTask();
+                mCountDownLatch.countDown();
             }
         });
     }

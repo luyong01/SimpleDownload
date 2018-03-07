@@ -1,15 +1,11 @@
-package com.ranze.simpledownloaddemo.core;
+package com.ranze.simpledownload.core;
 
-import com.ranze.simpledownloaddemo.SimpleDownloadClient;
-import com.ranze.simpledownloaddemo.core.net.NetWorker;
-import com.ranze.simpledownloaddemo.util.LogUtil;
+import com.ranze.simpledownload.SimpleDownloadClient;
+import com.ranze.simpledownload.core.net.NetWorker;
+import com.ranze.simpledownload.util.LogUtil;
 
 import java.io.File;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -22,8 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 
 abstract class BaseDownloader implements Downloader {
-    protected static ExecutorService sExecutorServices;
-    protected static Deque<Task> sRunningDeque = new ArrayDeque<>();
+    protected ExecutorService mExecutorService;
     protected SimpleDownloadClient client;
     protected Task mTask;
     protected volatile DownloadStatus mStatus;
@@ -32,31 +27,22 @@ abstract class BaseDownloader implements Downloader {
     protected DownloadListener mDownloadListener;
     protected long mContentLength;
     protected AtomicLong mDownloadedSize = new AtomicLong(0);
+    protected CountDownLatch mCountDownLatch;
 
-    public BaseDownloader(SimpleDownloadClient client, Task task) {
+
+    public BaseDownloader(SimpleDownloadClient client, Task task, CountDownLatch countDownLatch) {
         this.client = client;
         this.mTask = task;
         mStatus = DownloadStatus.preparing;
         mTargetFile = new File(task.savedPath() + File.separator + task.fileName());
         mNetWorker = NetWorker.getInstance(client.okHttpClient());
+        mCountDownLatch = countDownLatch;
     }
 
     @Override
-    public void start(DownloadListener listener) {
+    public void download(DownloadListener listener) {
         mDownloadListener = listener;
         mStatus = DownloadStatus.downloading;
-        // 去除重复 mTask
-        synchronized (BaseDownloader.class) {
-            if (!sRunningDeque.contains(mTask)) {
-                sRunningDeque.add(mTask);
-                if (mDownloadListener != null) {
-                    client.handler().post(() -> mDownloadListener.onStart());
-                }
-            } else {
-                LogUtil.d("Task " + mTask + "is already in running queue");
-                mStatus = DownloadStatus.canceled;
-            }
-        }
     }
 
     @Override
@@ -99,16 +85,13 @@ abstract class BaseDownloader implements Downloader {
     }
 
     protected synchronized ExecutorService executorService() {
-        if (sExecutorServices == null) {
-            sExecutorServices = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
+        if (mExecutorService == null) {
+            mExecutorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
                     new SynchronousQueue<Runnable>(), threadFactory("SimpleDownload Dispatcher#", false));
         }
-        return sExecutorServices;
+        return mExecutorService;
     }
 
-    protected synchronized void removeTask() {
-        sRunningDeque.remove(mTask);
-    }
 
     protected void doError(Throwable t) {
         // 如果 status 是 cancel, 则无需处理。
@@ -126,13 +109,6 @@ abstract class BaseDownloader implements Downloader {
         if (mTargetFile.exists()) {
             mTargetFile.delete();
         }
-    }
-
-    public synchronized List<Task> runningTasks() {
-        List<Task> result = new ArrayList<>();
-        result.addAll(sRunningDeque);
-
-        return Collections.unmodifiableList(result);
     }
 
     private static ThreadFactory threadFactory(final String name, final boolean daemon) {
