@@ -102,7 +102,7 @@ abstract class BaseDownloader implements Downloader {
             if (mDownloadListener != null) {
                 client.handler().post(() -> mDownloadListener.onError(t));
             }
-
+            deleteFile();
         }
     }
 
