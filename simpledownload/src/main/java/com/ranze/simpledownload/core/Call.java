@@ -7,15 +7,15 @@ package com.ranze.simpledownload.core;
 public interface Call {
     Task task();
 
-    void enqueue(DownloadListener listener);
+    void setDownloadListener(DownloadListener downloadListener);
 
-    void resume();
+    void start();
 
     void pause();
 
     void cancel();
 
-    boolean isExecuted();
+    boolean isExecuting();
 
     boolean isPaused();
 

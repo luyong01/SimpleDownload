@@ -9,11 +9,13 @@ import com.ranze.simpledownload.SimpleDownloadClient;
 public class RealCall implements Call {
     private SimpleDownloadClient mClient;
     private Task originTask;
-    private boolean mExecuted;
+    private boolean mExecuting;
     private boolean mPaused;
     private boolean mCanceled;
 
     private RealDownloader mRealDownloader;
+
+    private DownloadListener mDownloadListener;
 
     public RealCall(SimpleDownloadClient client, Task task) {
         mClient = client;
@@ -27,33 +29,31 @@ public class RealCall implements Call {
         return originTask;
     }
 
-    @Override
-    public void enqueue(DownloadListener listener) {
-        synchronized (this) {
-            if (mExecuted) {
-                throw new IllegalStateException("Already started ");
-            }
-            mExecuted = true;
-        }
-
-        mClient.dispatcher().enqueue(new DownloadCall(listener));
-
+    public void setDownloadListener(DownloadListener downloadListener) {
+        this.mDownloadListener = downloadListener;
     }
 
     @Override
-    public void resume() {
+    public void start() {
         synchronized (this) {
-            if (!mExecuted || !mPaused || mCanceled) {
-                throw new IllegalStateException("Current Call is not at paused status");
+            if (mExecuting) {
+                throw new IllegalStateException("Call is executing");
             }
-            mPaused = true;
+            if (isCanceled()) {
+                throw new IllegalStateException("Call is canceled");
+            }
+            mExecuting = true;
+            mPaused = false;
         }
+
+        mClient.dispatcher().enqueue(new DownloadCall(mDownloadListener));
 
     }
 
     @Override
     public void pause() {
         mPaused = true;
+        mExecuting = false;
         mRealDownloader.pause();
     }
 
@@ -64,8 +64,8 @@ public class RealCall implements Call {
     }
 
     @Override
-    public boolean isExecuted() {
-        return mExecuted;
+    public boolean isExecuting() {
+        return mExecuting;
     }
 
     @Override

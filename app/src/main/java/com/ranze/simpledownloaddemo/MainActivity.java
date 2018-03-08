@@ -74,38 +74,55 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
+        initNewCall(client, task);
+
         mDownloadBtn.setOnClickListener((view) -> {
-            mDownloadCall = client.newCall(task);
-            mDownloadCall.enqueue(new DownloadListener() {
-                @Override
-                public void onComplete() {
-                    Toast.makeText(MainActivity.this, "已完成", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    Toast.makeText(MainActivity.this, "下载出错", Toast.LENGTH_SHORT).show();
-                    Log.d("test", t.toString());
-                }
-
-                @Override
-                public void onProgress(int progress) {
-                    mProgressBar.setProgress(progress);
-                    mProgressText.setText(progress + " %");
-                }
-            });
+            if (!mDownloadCall.isPaused()) {
+                initNewCall(client, task);
+            }
+            mDownloadCall.start();
+            mDownloadBtn.setEnabled(false);
         });
 
-        mPauseBtn.setOnClickListener((view) -> mDownloadCall.pause());
+        mPauseBtn.setOnClickListener((view) -> {
+            mDownloadCall.pause();
+            mDownloadBtn.setEnabled(true);
+        });
 
         mCancelBtn.setOnClickListener((view) -> {
             mDownloadCall.cancel();
             mProgressBar.setProgress(0);
             mProgressText.setText("0 %");
+            mDownloadBtn.setEnabled(true);
         });
 
         verifyStoragePermissions(this);
 
+    }
+
+    private void initNewCall(SimpleDownloadClient client, Task task) {
+        mDownloadCall = client.newCall(task);
+        mDownloadCall.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onComplete() {
+                Toast.makeText(MainActivity.this, "已完成", Toast.LENGTH_SHORT).show();
+                mDownloadBtn.setEnabled(true);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Toast.makeText(MainActivity.this, "下载出错", Toast.LENGTH_SHORT).show();
+                mDownloadBtn.setEnabled(true);
+
+                Log.d("test", t.toString());
+            }
+
+            @Override
+            public void onProgress(int progress) {
+                mProgressBar.setProgress(progress);
+                mProgressText.setText(progress + " %");
+            }
+        });
     }
 
     public static void verifyStoragePermissions(Activity activity) {

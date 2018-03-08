@@ -35,8 +35,8 @@ public class Dispatcher {
             mReadyCalls.add(downloadCall);
         }
 
-        LogUtil.d("enqueue, Running calls: " + mRunningCalls);
-        LogUtil.d("enqueue, Ready calls: " + mReadyCalls);
+        LogUtil.d("start, Running calls: " + mRunningCalls);
+        LogUtil.d("start, Ready calls: " + mReadyCalls);
     }
 
     public void finished(DownloadCall call) {
