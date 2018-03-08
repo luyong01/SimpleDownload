@@ -97,11 +97,12 @@ abstract class BaseDownloader implements Downloader {
         // 如果 status 是 cancel, 则无需处理。
         // 如果 status 已经是 error, 则不要多次调用 onError
         if (mStatus != DownloadStatus.canceled && mStatus != DownloadStatus.error) {
+            // 如果某个线程出错，则将 mStatus 置为 error，让其它线程取消下载
             mStatus = DownloadStatus.error;
-            // 如果某个线程出错，则将 mStatus 置为 canceled，让其它线程取消下载
             if (mDownloadListener != null) {
                 client.handler().post(() -> mDownloadListener.onError(t));
             }
+
         }
     }
 

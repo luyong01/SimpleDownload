@@ -1,6 +1,7 @@
 package com.ranze.simpledownload.core;
 
 import com.ranze.simpledownload.core.RealCall.DownloadCall;
+import com.ranze.simpledownload.util.LogUtil;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -33,6 +34,9 @@ public class Dispatcher {
         } else {
             mReadyCalls.add(downloadCall);
         }
+
+        LogUtil.d("enqueue, Running calls: " + mRunningCalls);
+        LogUtil.d("enqueue, Ready calls: " + mReadyCalls);
     }
 
     public void finished(DownloadCall call) {
@@ -43,6 +47,8 @@ public class Dispatcher {
             promoteCalls();
         }
 
+        LogUtil.d("finished, Running calls: " + mRunningCalls);
+        LogUtil.d("finished, Ready calls: " + mReadyCalls);
     }
 
     private void promoteCalls() {

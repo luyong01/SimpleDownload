@@ -74,6 +74,7 @@ public class RealDownloader implements Downloader {
             }
             mDownloader.download(listener);
             mCountDownLatch.await();
+            LogUtil.d("All threads done");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             doError(e);
